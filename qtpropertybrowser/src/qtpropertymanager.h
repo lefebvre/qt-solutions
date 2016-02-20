@@ -44,6 +44,8 @@
 
 #include "qtpropertybrowser.h"
 #include <QLineEdit>
+#include <QUrl>
+#include <QString>
 
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE
@@ -761,6 +763,34 @@ private:
     Q_DECLARE_PRIVATE(QtCursorPropertyManager)
     Q_DISABLE_COPY(QtCursorPropertyManager)
 };
+
+class QT_QTPROPERTYBROWSER_EXPORT QtUrlPropertyManager : public QtAbstractPropertyManager
+{
+
+    Q_OBJECT
+    //
+    // Declare local Data structure
+    struct Data {
+        QUrl value;
+        QString filter;
+    };
+public:
+    QtUrlPropertyManager(QObject *parent = 0) : QtAbstractPropertyManager(parent) {}
+    QUrl value(const QtProperty *prop) const;
+    QString filter(const QtProperty *prop) const;
+public slots:
+    void setValue(QtProperty * prop, const QUrl &value);
+    void setFilter(QtProperty * prop, const QString &value);
+signals:
+    void valueChanged(QtProperty * prop, const QUrl &value);
+    void filterChanged(QtProperty * prop, const QString value);
+protected:
+    QString valueText(const QtProperty * prop) const;
+    void initializeProperty(QtProperty * prop);
+    void uninitializeProperty(QtProperty * prop);
+private:
+    QMap<const QtProperty *, Data> mValues;
+}; // class UrlPropertyManager
 
 #if QT_VERSION >= 0x040400
 QT_END_NAMESPACE

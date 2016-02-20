@@ -6640,6 +6640,84 @@ void QtCursorPropertyManager::uninitializeProperty(QtProperty *property)
     d_ptr->m_values.remove(property);
 }
 
+QUrl QtUrlPropertyManager::value(const QtProperty *prop) const
+{
+    if(!mValues.contains(prop))
+    {
+        return QString();
+    }
+    return mValues[prop].value;
+}//UrlPropertyManager::value
+
+QString QtUrlPropertyManager::filter(const QtProperty *prop) const
+{
+    if(!mValues.contains(prop)) return QString();
+    return mValues[prop].filter;
+}//UrlPropertyManager::filter
+
+void QtUrlPropertyManager::setValue(QtProperty *prop, const QUrl &value )
+{
+    //
+    // return if this property is not managed by me
+    if(!mValues.contains(prop)) return;
+    //
+    // get local copy of data
+    Data d = mValues[prop];
+    //
+    // if value is the same, then return
+    if(d.value == value) return;
+    //
+    // save new value
+    d.value = value;
+    //
+    // update managed version of data
+    mValues[prop]  = d;
+    //
+    // emit that this property has changed
+    emit propertyChanged(prop);
+    //
+    // emit that this value has changed
+    emit valueChanged(prop, d.value);
+}//UrlPropertyManager::setValue
+
+void QtUrlPropertyManager::setFilter(QtProperty *prop, const QString &value )
+{
+    if (!mValues.contains(prop))
+    {
+        return;
+    }
+
+    Data d = mValues[prop];
+
+    if (d.filter == value)
+    {
+        return;
+    }
+
+    d.filter = value;
+
+    mValues[prop] = d;
+
+    //
+    // emit that the filter has changed
+    emit filterChanged(prop, d.filter);
+}//UrlPropertyManager::setFilter
+
+QString QtUrlPropertyManager::valueText(const QtProperty *prop) const
+{
+    return value(prop).toString();
+} // UrlPropertyManager::valueText
+
+void QtUrlPropertyManager::initializeProperty(QtProperty *prop)
+{
+    mValues[prop] = Data();
+} // UrlPropertyManager::intializeProperty
+
+void QtUrlPropertyManager::uninitializeProperty(QtProperty *prop)
+{
+    mValues.remove(prop);
+} // UrlPropertyManager::unintializeProperty
+
 #if QT_VERSION >= 0x040400
 QT_END_NAMESPACE
 #endif

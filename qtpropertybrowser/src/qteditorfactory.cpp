@@ -42,6 +42,7 @@
 #include "qteditorfactory.h"
 #include "qtpropertybrowserutils_p.h"
 #include <QSpinBox>
+#include <QFileInfo>
 #include <QScrollBar>
 #include <QComboBox>
 #include <QAbstractItemView>
@@ -59,6 +60,7 @@
 #include <QStyleOption>
 #include <QPainter>
 #include <QMap>
+#include <QFileDialog>
 
 #if defined(Q_CC_MSVC)
 #    pragma warning(disable: 4786) /* MS VS 6: truncating debug info after 255 characters */
@@ -2593,6 +2595,160 @@ void QtFontEditWidget::paintEvent(QPaintEvent *)
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
+/**
+ * @brief The UrlEditWidget class
+ * Extension of qt-solutions/qtpropertybrowser for the purpose of providing
+ * a pushbutton file explorer along with QLineEdit of URL properties.
+ * This class provides the view of the property
+ */
+class QtUrlEditWidget : public QWidget
+{
+    //
+    // We have slots and signals so we must register as A Q_OBJECT
+    Q_OBJECT
+public:
+    QtUrlEditWidget(QWidget *parent = 0);
+//    void setFilePath(const QString &filePath);
+    void setFilePath(const QUrl &filePath);
+//    QString filePath() const {
+//        return mLineEdit->text();
+//    }
+    QUrl filePath() const {
+        return QUrl(mLineEdit->text());
+    }
+    void setFilter(const QString &filter) {
+        mFilter = filter;
+    }
+    QString filter() const {
+        return mFilter;
+    }
+signals:
+    void filePathChanged(const QUrl &filePath);
+protected:
+    void focusInEvent(QFocusEvent *event);
+    void focusOutEvent(QFocusEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
+private slots:
+    void buttonClicked();
+    void filePathChanged(const QString &path);
+private:
+    void checkExistence();
+    QLineEdit* mLineEdit;
+    QString    mFilter;
+}; // class QtUrlEditWidget
+
+
+QtUrlEditWidget::QtUrlEditWidget(QWidget *parent)
+    : QWidget(parent)
+{
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    mLineEdit = new QLineEdit(this);
+    mLineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Expanding
+                                         , QSizePolicy::Preferred));
+    QToolButton *button = new QToolButton(this);
+    button->setSizePolicy(QSizePolicy(QSizePolicy::Fixed
+                                      , QSizePolicy::Preferred));
+    button->setText(QLatin1String("..."));
+    layout->addWidget(mLineEdit);
+    layout->addWidget(button);
+    setFocusProxy(mLineEdit);
+    setFocusPolicy(Qt::StrongFocus);
+    setAttribute(Qt::WA_InputMethodEnabled);
+
+    //
+    // Connect signals and slots
+    connect(mLineEdit
+            , SIGNAL(textEdited(const QString &))
+            , this
+            , SLOT(filePathChanged(const QString &)));
+    connect(button
+            , SIGNAL(clicked())
+            , this
+            , SLOT(buttonClicked()));
+} // UrlEditWidget::UrlEditWidget
+
+void QtUrlEditWidget::setFilePath(const QUrl &filePath)
+{
+    if (mLineEdit->text() != filePath.toString())
+    {
+        //
+        // Set the new filepath
+        mLineEdit->setText(filePath.toString());
+    }
+    //
+    // check if the file path exists
+    checkExistence();
+}
+
+void QtUrlEditWidget::checkExistence()
+{
+    QString filePath = mLineEdit->text();
+    //
+    // check if the file path exists
+    QFileInfo fileInfo(filePath);
+    QPalette palette = mLineEdit->palette();
+    if(!fileInfo.exists())
+    {
+        palette.setColor(QPalette::Base, QColor(Qt::red).lighter());
+        mLineEdit->setPalette(palette);
+        mLineEdit->repaint();
+    } else
+    {
+        palette.setColor(QPalette::Base, Qt::white);
+        mLineEdit->setPalette(palette);
+        mLineEdit->repaint();
+    }
+} // UrlEditWidget::checkExistance
+
+void QtUrlEditWidget::buttonClicked()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Select a file")
+                       , mLineEdit->text()
+                       , mFilter);
+    if (filePath.isNull())
+    {
+        return;
+    }
+    mLineEdit->setText(filePath);
+    emit filePathChanged(QUrl(filePath));
+} // UrlEditWidget::buttonClicked
+
+void QtUrlEditWidget::filePathChanged(const QString &path)
+{
+    QUrl url(path);
+    emit filePathChanged(url);
+} // UrlEditWidget::filePathChanged
+
+void QtUrlEditWidget::focusInEvent(QFocusEvent *e)
+{
+    mLineEdit->event(e);
+    if (e->reason() == Qt::TabFocusReason
+            || e->reason() == Qt::BacktabFocusReason)
+    {
+        mLineEdit->selectAll();
+    }
+    QWidget::focusInEvent(e);
+} // UrlEditWidget::focusInEvent
+
+void QtUrlEditWidget::focusOutEvent(QFocusEvent *e)
+{
+    mLineEdit->event(e);
+    QWidget::focusOutEvent(e);
+} // UrlEditWidget::focusOutEvent
+
+void QtUrlEditWidget::keyPressEvent(QKeyEvent *e)
+{
+    mLineEdit->event(e);
+} // UrlEditWidget::keyPressEvent
+
+void QtUrlEditWidget::keyReleaseEvent(QKeyEvent *e)
+{
+    mLineEdit->event(e);
+} // UrlEditWidget::keyReleaseEvent
+
 // QtFontEditorFactoryPrivate
 
 class QtFontEditorFactoryPrivate : public EditorFactoryPrivate<QtFontEditWidget>
@@ -2694,6 +2850,131 @@ QWidget *QtFontEditorFactory::createEditor(QtFontPropertyManager *manager,
 void QtFontEditorFactory::disconnectPropertyManager(QtFontPropertyManager *manager)
 {
     disconnect(manager, SIGNAL(valueChanged(QtProperty*,QFont)), this, SLOT(slotPropertyChanged(QtProperty*,QFont)));
+}
+
+QtUrlEditFactory::~QtUrlEditFactory()
+{
+//    QList<QtUrlEditWidget*> editors = mEditorToProperty.keys();
+//    QListIterator<QtUrlEditWidget*> it(editors);
+//    while(it.hasNext()) delete it.next();
+}
+
+void QtUrlEditFactory::connectPropertyManager(QtUrlPropertyManager *manager)
+{
+    connect( manager
+             , SIGNAL(valueChanged(QtProperty*,QUrl))
+             , this
+             , SLOT(slotPropertyChanged(QtProperty*,QUrl)));
+    connect( manager
+             , SIGNAL(filterChanged(QtProperty*,QString))
+             , this
+             , SLOT(slotFilterChanged(QtProperty*,QString)));
+}
+
+void QtUrlEditFactory::disconnectPropertyManager(QtUrlPropertyManager *manager)
+{
+    disconnect(manager
+               , SIGNAL(valueChanged(QtProperty *, const QUrl &))
+               , this
+               , SLOT(slotPropertyChanged(QtProperty *, const QUrl &)));
+    disconnect(manager
+               , SIGNAL(filterChanged(QtProperty *, const QString &))
+               , this
+               , SLOT(slotFilterChanged(QtProperty *, const QString &)));
+}
+
+QWidget * QtUrlEditFactory::createEditor(QtUrlPropertyManager *manager
+                                       , QtProperty *property
+                                       , QWidget *parent)
+{
+    QtUrlEditWidget *editor = new QtUrlEditWidget(parent);
+    editor->setFilePath(manager->value(property).toString());
+    editor->setFilter(manager->filter(property));
+    mCreatedEditors[property].append(editor);
+    mEditorToProperty[editor] = property;
+
+    connect(editor
+            , SIGNAL(filePathChanged(const QUrl&))
+            , this
+            , SLOT(slotSetValue(const QUrl&)));
+    connect(editor
+            , SIGNAL(destroyed(QObject *))
+            , this
+            , SLOT(slotEditorDestroyed(QObject *)));
+    return editor;
+}
+
+void QtUrlEditFactory::slotPropertyChanged(QtProperty *property,
+        const QUrl &value)
+{
+    if(!mCreatedEditors.contains(property))
+    {
+        return;
+    }
+
+    QList<QtUrlEditWidget *> editors = mCreatedEditors[property];
+    QListIterator<QtUrlEditWidget *> iter(editors);
+    while (iter.hasNext())
+    {
+        iter.next()->setFilePath(value.toString());
+    }
+}
+
+void QtUrlEditFactory::slotFilterChanged(QtProperty *property,
+                                       const QString &filter)
+{
+    if (!mCreatedEditors.contains(property))
+    {
+        return;
+    }
+
+    QList<QtUrlEditWidget *> editors = mCreatedEditors[property];
+    QListIterator<QtUrlEditWidget *> iter(editors);
+    while (iter.hasNext())
+    {
+        iter.next()->setFilter(filter);
+    }
+}
+
+void QtUrlEditFactory::slotSetValue(const QUrl &value)
+{
+    QObject *object = sender();
+    QMap<QtUrlEditWidget *, QtProperty *>::ConstIterator iter =
+        mEditorToProperty.constBegin();
+    while (iter != mEditorToProperty.constEnd())
+    {
+        if (iter.key() == object)
+        {
+            QtProperty *property = iter.value();
+            QtUrlPropertyManager *manager = propertyManager(property);
+            if (!manager)
+            {
+                return;
+            }
+            manager->setValue(property, value);
+            return;
+        }
+        iter++;
+    }
+}
+
+void QtUrlEditFactory::slotEditorDestroyed(QObject *object)
+{
+    QMap<QtUrlEditWidget *, QtProperty *>::ConstIterator iter =
+        mEditorToProperty.constBegin();
+    while (iter != mEditorToProperty.constEnd()) {
+        if (iter.key() == object) {
+            QtUrlEditWidget *editor = iter.key();
+            QtProperty *property = iter.value();
+            mEditorToProperty.remove(editor);
+            mCreatedEditors[property].removeAll(editor);
+            if (mCreatedEditors[property].isEmpty()) {
+                mCreatedEditors.remove(property);
+            }
+            return;
+        }
+        iter++;
+    }
 }
 
 #if QT_VERSION >= 0x040400

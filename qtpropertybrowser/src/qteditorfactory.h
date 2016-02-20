@@ -399,6 +399,33 @@ private:
     Q_PRIVATE_SLOT(d_func(), void slotSetValue(const QFont &))
 };
 
+class QtUrlEditWidget;
+class QT_QTPROPERTYBROWSER_EXPORT QtUrlEditFactory : public QtAbstractEditorFactory<QtUrlPropertyManager>
+{
+    //
+    // We have slots so we must declare this as a Q_OBJECT
+    Q_OBJECT
+public:
+    QtUrlEditFactory(QObject *parent = 0)
+        : QtAbstractEditorFactory<QtUrlPropertyManager>(parent)
+    { }
+    virtual ~QtUrlEditFactory();
+protected:
+    virtual void connectPropertyManager(QtUrlPropertyManager *manager);
+    void disconnectPropertyManager(QtUrlPropertyManager *manager);
+    virtual QWidget *createEditor(QtUrlPropertyManager *manager
+                                  , QtProperty *property
+                                  , QWidget *parent);
+private slots:
+    void slotPropertyChanged(QtProperty *property, const QUrl &value);
+    void slotFilterChanged(QtProperty *property, const QString &filter);
+    void slotSetValue(const QUrl &value);
+    void slotEditorDestroyed(QObject *object);
+private:
+    QMap<QtProperty*, QList<QtUrlEditWidget*> > mCreatedEditors;
+    QMap<QtUrlEditWidget*, QtProperty*> mEditorToProperty;
+}; // class UrlEditFactory
+
 #if QT_VERSION >= 0x040400
 QT_END_NAMESPACE
 #endif

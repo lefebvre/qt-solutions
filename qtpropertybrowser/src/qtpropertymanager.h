@@ -46,6 +46,7 @@
 #include <QLineEdit>
 #include <QUrl>
 #include <QString>
+#include <QMap>
 
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE

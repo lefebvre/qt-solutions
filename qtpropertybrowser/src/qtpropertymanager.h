@@ -43,7 +43,12 @@
 #define QTPROPERTYMANAGER_H
 
 #include "qtpropertybrowser.h"
+#include "qglobal.h"
+#if QT_VERSION >= 0x050000
+#include <QtWidgets/QLineEdit>
+#else
 #include <QLineEdit>
+#endif
 #include <QUrl>
 #include <QString>
 #include <QMap>

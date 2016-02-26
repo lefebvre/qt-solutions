@@ -41,26 +41,46 @@
 
 #include "qteditorfactory.h"
 #include "qtpropertybrowserutils_p.h"
+#include "qglobal.h"
+#if QT_VERSION >= 0x050000
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QScrollBar>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QDateTimeEdit>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QToolButton>
+#include <QtWidgets/QStyleOption>
+#include <QtWidgets/QColorDialog>
+#include <QtWidgets/QFontDialog>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QSpacerItem>
+#else
+#include <QApplication>
+#include <QAbstractItemView>
 #include <QSpinBox>
-#include <QFileInfo>
 #include <QScrollBar>
 #include <QComboBox>
-#include <QAbstractItemView>
 #include <QLineEdit>
 #include <QDateTimeEdit>
 #include <QHBoxLayout>
 #include <QMenu>
-#include <QKeyEvent>
-#include <QApplication>
 #include <QLabel>
 #include <QToolButton>
+#include <QStyleOption>
 #include <QColorDialog>
 #include <QFontDialog>
+#include <QFileDialog>
 #include <QSpacerItem>
-#include <QStyleOption>
+#endif
+#include <QFileInfo>
+#include <QKeyEvent>
 #include <QPainter>
 #include <QMap>
-#include <QFileDialog>
 
 #if defined(Q_CC_MSVC)
 #    pragma warning(disable: 4786) /* MS VS 6: truncating debug info after 255 characters */

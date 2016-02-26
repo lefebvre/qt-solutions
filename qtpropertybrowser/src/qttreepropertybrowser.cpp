@@ -40,16 +40,27 @@
 
 
 #include "qttreepropertybrowser.h"
+#include "qglobal.h"
+#if QT_VERSION >= 0x050000
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QItemDelegate>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QStyle>
+#include <QtWidgets/QHeaderView>
+#else
+#include <QApplication>
+#include <QTreeWidget>
+#include <QHBoxLayout>
+#include <QItemDelegate>
+#include <QStyle>
+#include <QHeaderView>
+#endif
 #include <QSet>
 #include <QIcon>
-#include <QTreeWidget>
-#include <QItemDelegate>
-#include <QHBoxLayout>
-#include <QHeaderView>
 #include <QPainter>
-#include <QApplication>
 #include <QFocusEvent>
-#include <QStyle>
 #include <QPalette>
 
 #if QT_VERSION >= 0x040400
@@ -483,8 +494,12 @@ void QtTreePropertyBrowserPrivate::init(QWidget *parent)
     m_delegate = new QtPropertyEditorDelegate(parent);
     m_delegate->setEditorPrivate(this);
     m_treeWidget->setItemDelegate(m_delegate);
+#if QT_VERSION < 0x050000
     m_treeWidget->header()->setMovable(false);
     m_treeWidget->header()->setResizeMode(QHeaderView::Stretch);
+#else
+    m_treeWidget->header()->sectionResizeMode(QHeaderView::Stretch);
+#endif
 
     m_expandIcon = drawIndicatorIcon(q_ptr->palette(), q_ptr->style());
 
@@ -896,7 +911,11 @@ void QtTreePropertyBrowser::setResizeMode(QtTreePropertyBrowser::ResizeMode mode
         case QtTreePropertyBrowser::Stretch:
         default:                                      m = QHeaderView::Stretch;          break;
     }
+#if QT_VERSION < 0x050000
     d_ptr->m_treeWidget->header()->setResizeMode(m);
+#else
+    d_ptr->m_treeWidget->header()->sectionResizeMode(m);
+#endif
 }
 
 /*!

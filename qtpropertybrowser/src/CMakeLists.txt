@@ -47,7 +47,7 @@ qteditorfactory.cpp
 qtgroupboxpropertybrowser.cpp
 qtpropertybrowser.cpp
 qtpropertybrowserutils.cpp
-#moc_qtpropertybrowserutils_p.cpp # this guy gets generated below.
+moc_qtpropertybrowserutils_p.cpp # this guy gets generated below.
 qtpropertymanager.cpp
 qttreepropertybrowser.cpp
 qtvariantproperty.cpp

@@ -41,22 +41,12 @@
 
 #include "qtpropertymanager.h"
 #include "qtpropertybrowserutils_p.h"
-#include "qglobal.h"
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/QStyleOption>
-#include <QtWidgets/QStyle>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QLineEdit>
-#else
 #include <QStyleOption>
 #include <QStyle>
 #include <QApplication>
 #include <QLabel>
 #include <QCheckBox>
 #include <QLineEdit>
-#endif
 #include <QPainter>
 #include <QDateTime>
 #include <QLocale>

@@ -39,23 +39,15 @@
 ****************************************************************************/
 
 
-#include "qglobal.h"
 #include "qtbuttonpropertybrowser.h"
-#include "qglobal.h"
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/QGridLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QStyle>
-#else
 #include <QGridLayout>
 #include <QLabel>
 #include <QToolButton>
 #include <QStyle>
-#endif
 #include <QSet>
 #include <QTimer>
 #include <QMap>
+
 
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE

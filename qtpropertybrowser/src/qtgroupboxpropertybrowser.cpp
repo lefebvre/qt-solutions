@@ -40,16 +40,9 @@
 
 
 #include "qtgroupboxpropertybrowser.h"
-#include "qglobal.h"
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/QGridLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QGroupBox>
-#else
 #include <QGridLayout>
 #include <QLabel>
 #include <QGroupBox>
-#endif
 #include <QSet>
 #include <QTimer>
 #include <QMap>

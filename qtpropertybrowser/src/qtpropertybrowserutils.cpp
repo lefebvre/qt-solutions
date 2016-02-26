@@ -40,22 +40,12 @@
 
 
 #include "qtpropertybrowserutils_p.h"
-#include "qglobal.h"
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QStyleOption>
-#else
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QCheckBox>
 #include <QLineEdit>
 #include <QMenu>
 #include <QStyleOption>
-#endif
 #include <QPainter>
 #include <QMouseEvent>
 

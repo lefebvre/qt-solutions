@@ -40,23 +40,12 @@
 
 
 #include "qttreepropertybrowser.h"
-#include "qglobal.h"
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QTreeWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QItemDelegate>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QStyle>
-#include <QtWidgets/QHeaderView>
-#else
 #include <QApplication>
 #include <QTreeWidget>
 #include <QHBoxLayout>
 #include <QItemDelegate>
 #include <QStyle>
 #include <QHeaderView>
-#endif
 #include <QSet>
 #include <QIcon>
 #include <QPainter>

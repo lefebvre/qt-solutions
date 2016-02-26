@@ -53,12 +53,7 @@
 #ifndef QTPROPERTYBROWSERUTILS_H
 #define QTPROPERTYBROWSERUTILS_H
 
-#include "qglobal.h"
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/QWidget>
-#else
 #include <QWidget>
-#endif
 #include <QMap>
 #include <QIcon>
 #include <QStringList>

@@ -2,7 +2,7 @@
 #
 # Process demo resource file
 #
-IF(TPL_ENABLE_QT)
+IF(NOT USE_QT5)
    QT4_ADD_RESOURCES(resource_result demo.qrc)
 ELSE() # assume qt5
    QT5_ADD_RESOURCES(resource_result demo.qrc)

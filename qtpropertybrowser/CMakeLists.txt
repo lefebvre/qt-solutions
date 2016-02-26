@@ -7,12 +7,6 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
       ADD_DEFINITIONS("-DQT_QTPROPERTYBROWSER_EXPORT")
    ENDIF()
 ENDIF()
-IF(TPL_ENABLE_QT AND TPL_ENABLE_Qt5Gui)
-    MESSAGE(FATAL_ERROR "Both Qt4 and Qt5 are enabled in your configuration. Only one is allowed.")
-ENDIF()
-IF(NOT TPL_ENABLE_QT AND NOT TPL_ENABLE_Qt5Gui)
-   MESSAGE(FATAL_ERROR "QT or Qt5Gui is required for this package.")
-ENDIF()
 #
 # Add src directory
 #

@@ -85,7 +85,7 @@ qtvariantproperty.h
 #
 # MOC the headers
 # several cpp files required because of "PRIVATE" classes
-IF(TPL_ENABLE_QT)
+IF(NOT USE_QT5)
    JQT4_WRAP_CPP(out_files ${MOC_LIST})
    QT4_ADD_RESOURCES(resource_result  qtpropertybrowser.qrc)
 ELSE() # assume Qt5

@@ -55,7 +55,6 @@
 #include <QIcon>
 #include <QMetaEnum>
 #include <QFontDatabase>
-
 #include <limits.h>
 #include <float.h>
 
@@ -2125,10 +2124,17 @@ class QtDateTimePropertyManagerPrivate
     Q_DECLARE_PUBLIC(QtDateTimePropertyManager)
 public:
 
+    // default format
     QString m_format;
 
     typedef QMap<const QtProperty *, QDateTime> PropertyValueMap;
+    typedef QMap<const QtProperty *, QString> PropertyFormatMap;
+    typedef QMap<const QtProperty *, Qt::TimeSpec> PropertyTimeSpecMap;
+    typedef QMap<const QtProperty *, bool> PropertyCalendarPopupMap;
+    PropertyFormatMap m_formats;
     PropertyValueMap m_values;
+    PropertyTimeSpecMap m_timeSpecs;
+    PropertyCalendarPopupMap m_calendarPopup;
 };
 
 /*! \class QtDateTimePropertyManager
@@ -2188,6 +2194,42 @@ QDateTime QtDateTimePropertyManager::value(const QtProperty *property) const
 {
     return d_ptr->m_values.value(property, QDateTime());
 }
+/*!
+    Returns the given \a property's format.
+
+    If the given \a property is not managed by this manager, this
+    function returns an default QString object.
+
+    \sa setFormat()
+*/
+QString QtDateTimePropertyManager::format(const QtProperty *property) const
+{
+    return d_ptr->m_formats.value(property, d_ptr->m_format);
+}
+/*!
+    Returns the given \a property's time spec.
+
+    If the given \a property is not managed by this manager, this
+    function returns the default timespec.
+
+    \sa setTimeSpec()
+*/
+Qt::TimeSpec QtDateTimePropertyManager::timeSpec(const QtProperty *property) const
+{
+    return d_ptr->m_timeSpecs.value(property, Qt::LocalTime);
+}
+/*!
+    Returns the given \a property's calendar popup.
+
+    If the given \a property is not managed by this manager, this
+    function returns false.
+
+    \sa setCalendarPopup()
+*/
+bool QtDateTimePropertyManager::calendarPopup(const QtProperty *property) const
+{
+    return d_ptr->m_calendarPopup.value(property, false);
+}
 
 /*!
     \reimp
@@ -2197,9 +2239,40 @@ QString QtDateTimePropertyManager::valueText(const QtProperty *property) const
    const QtDateTimePropertyManagerPrivate::PropertyValueMap::const_iterator it = d_ptr->m_values.constFind(property);
     if (it == d_ptr->m_values.constEnd())
         return QString();
-    return it.value().toString(d_ptr->m_format);
+    const auto& fit = d_ptr->m_formats.find(property);
+    if(fit == d_ptr->m_formats.constEnd())
+    {
+        return it.value().toString(d_ptr->m_format);
+    }
+    return it.value().toString(fit.value());
 }
 
+void QtDateTimePropertyManager::setFormat(QtProperty *property, const QString &value)
+{
+    d_ptr->m_formats[property] = value;
+    //
+    // emit that this property has changed
+    emit propertyChanged(property);
+}
+void QtDateTimePropertyManager::setTimeSpec(QtProperty *property, Qt::TimeSpec value)
+{
+    d_ptr->m_timeSpecs[property] = value;
+    //
+    // emit that this property has changed
+    emit propertyChanged(property);
+}
+
+/*!
+    \fn void QtDateTimePropertyManager::setCalendarPopup(QtProperty *property, bool calendarPopup)
+
+    Sets the value of the given \a property to \a value.
+
+    \sa calendarPopup()
+*/
+void QtDateTimePropertyManager::setCalendarPopup(QtProperty *property, bool value)
+{
+    d_ptr->m_calendarPopup[property] = value;
+}
 /*!
     \fn void QtDateTimePropertyManager::setValue(QtProperty *property, const QDateTime &value)
 
@@ -2229,6 +2302,10 @@ void QtDateTimePropertyManager::initializeProperty(QtProperty *property)
 void QtDateTimePropertyManager::uninitializeProperty(QtProperty *property)
 {
     d_ptr->m_values.remove(property);
+    if(d_ptr->m_formats.contains(property))
+    {
+        d_ptr->m_formats.remove(property);
+    }
 }
 
 // QtKeySequencePropertyManager

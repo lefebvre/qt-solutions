@@ -1507,6 +1507,9 @@ QWidget *QtDateTimeEditFactory::createEditor(QtDateTimePropertyManager *manager,
 {
     QDateTimeEdit *editor =  d_ptr->createEditor(property, parent);
     editor->setDateTime(manager->value(property));
+    editor->setDisplayFormat(manager->format(property));
+    editor->setTimeSpec(manager->timeSpec(property));
+    editor->setCalendarPopup(manager->calendarPopup(property));
 
     connect(editor, SIGNAL(dateTimeChanged(const QDateTime &)),
                 this, SLOT(slotSetValue(const QDateTime &)));

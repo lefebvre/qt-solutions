@@ -280,9 +280,15 @@ public:
     ~QtDateTimePropertyManager();
 
     QDateTime value(const QtProperty *property) const;
+    QString format(const QtProperty *property) const;
+    Qt::TimeSpec timeSpec(const QtProperty *property) const;
+    bool calendarPopup(const QtProperty *property) const;
 
 public Q_SLOTS:
+    void setFormat(QtProperty *property, const QString &value);
     void setValue(QtProperty *property, const QDateTime &val);
+    void setTimeSpec(QtProperty *property, Qt::TimeSpec spec);
+    void setCalendarPopup(QtProperty *propert, bool calendarPopup);
 Q_SIGNALS:
     void valueChanged(QtProperty *property, const QDateTime &val);
 protected:
